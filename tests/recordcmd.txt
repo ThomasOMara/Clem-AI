@@ -1,0 +1,1 @@
+arecord -D hw:3,0 -f S16_LE -r 22050 -c 1 -d 5 test.wav
