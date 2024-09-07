@@ -1,37 +1,71 @@
 '''
-Convert speech from mic to text
+Convert speech from mic into text stream
+'''
+def get_mic_input():
+  import speech_recognition as sr
+  import os
+  import json
+  from vosk import Model, KaldiRecognizer
 
-- PyAudio to interface with mic
+  # Set up Vosk model path
+  vosk_model_path = "models/vosk-model-small-en-us-0.15"
 
-- SpeechRecognition to listen to mic and convert the audio into text via
-  Google Web Speech API
+  # Check if the Vosk model exists
+  if not os.path.exists(vosk_model_path):
+      print(f"Model not found at {vosk_model_path}")
+      exit(1)
 
-- Note: need to be able to read the speech word-for-word (ie not poll every
-  second or something in case you miss words)
+  # Load the Vosk model
+  model = Model(vosk_model_path)
 
-- Maybe can do every x seconds and remove duplicate words
-  (want to include them though
+  # Create an instance of Recognizer
+  recognizer = sr.Recognizer()
+
+  # Use the microphone as source
+  with sr.Microphone() as source:
+      print("Adjusting for ambient noise...")
+      recognizer.adjust_for_ambient_noise(source)
+
+      print("Say something:")
+      # Record the audio from the microphone
+      audio = recognizer.listen(source)
+
+      try:
+          # Convert the audio data into bytes for Vosk
+          audio_data = audio.get_raw_data(convert_rate=16000, convert_width=2)
+
+          # Set up the Kaldi recognizer with the model and sample rate
+          kaldi_recognizer = KaldiRecognizer(model, 16000)
+
+          if kaldi_recognizer.AcceptWaveform(audio_data):
+              result = kaldi_recognizer.Result()
+              # Parse the result as JSON and extract the text
+              result_json = json.loads(result)
+              print("Recognized text:", result_json.get('text', ''))
+          else:
+              print("Could not understand the audio")
+
+      except sr.UnknownValueError:
+          print("Speech Recognition could not understand the audio")
+      except sr.RequestError as e:
+          print(f"Error with the Speech Recognition service: {e}")
+
+
 
 '''
-
-# I think you need to turn on port audio
-
-# Then use pyaudio to create the stream
-
-# Link this somehow to Google Web Speech API
-
-
-import pyaudio
-import wave
-
+# Save mic input into wav file
 def get_mic_input():
+
+  import pyaudio
+  import wave
+
   buffer_size = 1024
   audio_format = pyaudio.paInt16
   num_channels = 1
   sample_rate = 8000 # kHz sampling rate
   record_length = 5 # recording time in seconds
   output_filename = "output.wav"
-  mic_device_index = 3
+  #mic_device_index = 3
 
   pyaudio_instance = pyaudio.PyAudio()
 
@@ -41,7 +75,7 @@ def get_mic_input():
                       rate = sample_rate,
                       input = True,
                       frames_per_buffer = buffer_size,
-                      #input_device_index = mic_device_index
+                      #input_device_index = mic_device_index # Including throws error
                       )
 
   print("Recording in progress")
@@ -64,3 +98,4 @@ def get_mic_input():
   wave_file.setframerate(sample_rate)
   wave_file.writeframes(b''.join(stream_frames))
   wave_file.close()
+'''
