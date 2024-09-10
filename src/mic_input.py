@@ -1,10 +1,12 @@
 '''
 Convert speech from mic into text stream
 '''
+
 def get_mic_input():
   import speech_recognition as sr
   import os
   import json
+  import pyaudio
   from vosk import Model, KaldiRecognizer
 
   vosk_model_path = "models/vosk-model-small-en-us-0.15"
@@ -14,33 +16,93 @@ def get_mic_input():
       exit(1)
 
   model = Model(vosk_model_path)
-  recognizer = sr.Recognizer()
+  recogniser = KaldiRecognizer(model, 16000)
+  #recogniser.SetWords(True) # For detailed jason
+  word_array = []
 
-  with sr.Microphone() as source:
+  p = pyaudio.PyAudio()
+  stream = p.open(format = pyaudio.paInt16, channels = 1, rate = 16000, input = True, frames_per_buffer = 8000)
+  stream.start_stream()
 
-      print("Adjusting for ambient noise...")
-      recognizer.adjust_for_ambient_noise(source)
-      print("Say something:")
-      audio = recognizer.listen(source)
+  print("Listening... Ctrl+C to stop.")
 
-      try:
+  num_processed_words = 0
 
-          audio_data = audio.get_raw_data(convert_rate=16000, convert_width=2) # Convert audio data into bytes for Vosk
-          kaldi_recognizer = KaldiRecognizer(model, 16000) # Set up the Kaldi recognizer
-          #kaldi_recognizer.SetWords(True)  # Enable detailed json output, including array of words
+  try:
+    while True:
 
-          if kaldi_recognizer.AcceptWaveform(audio_data):
-              result = kaldi_recognizer.Result()
-              result_json = json.loads(result)
-              print("Recognized text:", result_json.get('text', ''))
+      data = stream.read(4000, exception_on_overflow = False)
 
-          else:
-              print("Could not understand the audio")
+      '''
+      if recognizer.AcceptWaveform(data):
+        # Full result obtained after sentence completion
+        result = json.loads(recognizer.Result())
+        if 'text' in result and result['text'].strip():
+          recognized_text = result['text']
+          print(f"Recognized sentence: {recognized_text}")
 
-      except sr.UnknownValueError:
-          print("Speech Recognition could not understand the audio")
-      except sr.RequestError as e:
-          print(f"Error with the Speech Recognition service: {e}")
+
+      else:
+        # Partial result obtained word by word
+        partial_result = json.loads(recognizer.PartialResult())
+        if 'partial' in partial_result and partial_result['partial'].strip():
+          word = partial_result['partial']
+          word_array.append(word)
+          print(f"Recognized word: {word}")
+      '''
+
+      '''
+      # Trying to get partial words (word-by-word)
+
+      if recognizer.AcceptWaveform(data):
+        sentence_dict = json.loads(recognizer.Result())
+        results_sentence_len = len(sentence_dict['result'])
+        for i in range(num_processed_words, results_sentence_len):
+          word_array.append(sentence_dict['result'][i] )
+
+        # Reset
+        num_processed_words = 0
+        sentence_dict = ""
+        recognizer = KaldiRecognizer(model, 16000)
+        recognizer.SetWords(True)
+
+      else:
+
+        partial_result = json.loads(recognizer.PartialResult())
+
+        print(partial_result)
+        #print(len(partial_result))
+
+        if 'partial' in partial_result and partial_result['partial'].strip():
+          word = partial_result['partial']
+
+          print(partial_result)
+          #print("word" + word)
+
+          word_array.append(word)
+          #print(f"Recognized word: {word}")
+      '''
+
+      # Just get the whole sentence
+
+      if recogniser.AcceptWaveform(data):
+        sentence_dict = json.loads(recogniser.Result())
+        print(sentence_dict['text'])
+
+        # Reset
+        num_processed_words = 0
+        sentence_dict = ""
+        recogniser = KaldiRecognizer(model, 16000)
+        #recogniser.SetWords(True)
+
+  except KeyboardInterrupt:
+    print("\nProgram interrupted with Ctrl+C. Exiting...")
+    print(f"Captured words: {word_array}")
+
+  finally:
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
 
 
 '''

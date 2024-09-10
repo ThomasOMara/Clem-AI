@@ -5,7 +5,7 @@
 import mic_input
 
 def main():
-    # Todo: test to make sure the api keys are working
+
     # Todo: do we want to test the mic and speakers are working here?
 
     mic_input.get_mic_input()
@@ -24,13 +24,9 @@ def main():
 
     '''
 
-
-
-
-
-
 if __name__ == '__main__':
     main()
+
 
 '''
 NEXT
