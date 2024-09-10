@@ -7,41 +7,33 @@ def get_mic_input():
   import json
   from vosk import Model, KaldiRecognizer
 
-  # Set up Vosk model path
   vosk_model_path = "models/vosk-model-small-en-us-0.15"
 
-  # Check if the Vosk model exists
   if not os.path.exists(vosk_model_path):
       print(f"Model not found at {vosk_model_path}")
       exit(1)
 
-  # Load the Vosk model
   model = Model(vosk_model_path)
-
-  # Create an instance of Recognizer
   recognizer = sr.Recognizer()
 
-  # Use the microphone as source
   with sr.Microphone() as source:
+
       print("Adjusting for ambient noise...")
       recognizer.adjust_for_ambient_noise(source)
-
       print("Say something:")
-      # Record the audio from the microphone
       audio = recognizer.listen(source)
 
       try:
-          # Convert the audio data into bytes for Vosk
-          audio_data = audio.get_raw_data(convert_rate=16000, convert_width=2)
 
-          # Set up the Kaldi recognizer with the model and sample rate
-          kaldi_recognizer = KaldiRecognizer(model, 16000)
+          audio_data = audio.get_raw_data(convert_rate=16000, convert_width=2) # Convert audio data into bytes for Vosk
+          kaldi_recognizer = KaldiRecognizer(model, 16000) # Set up the Kaldi recognizer
+          #kaldi_recognizer.SetWords(True)  # Enable detailed json output, including array of words
 
           if kaldi_recognizer.AcceptWaveform(audio_data):
               result = kaldi_recognizer.Result()
-              # Parse the result as JSON and extract the text
               result_json = json.loads(result)
               print("Recognized text:", result_json.get('text', ''))
+
           else:
               print("Could not understand the audio")
 
@@ -49,7 +41,6 @@ def get_mic_input():
           print("Speech Recognition could not understand the audio")
       except sr.RequestError as e:
           print(f"Error with the Speech Recognition service: {e}")
-
 
 
 '''
