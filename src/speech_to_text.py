@@ -1,5 +1,5 @@
 '''
-Convert mic data into text
+Convert mic data into text.
 '''
 
 from globals import mic_data_queue
@@ -20,10 +20,14 @@ def speech_to_text():
     recogniser = KaldiRecognizer(model, 16000)
 
     while True:
+
         if not mic_data_queue.empty():
             data = mic_data_queue.get()
+
             if recogniser.AcceptWaveform(data):
                 sentence_dict = json.loads(recogniser.Result())
                 sentence_text = sentence_dict['text']
-                print(sentence_text)
-                text_queue.put(sentence_text)
+
+                if sentence_text:
+                    print(sentence_text)
+                    text_queue.put(sentence_text)

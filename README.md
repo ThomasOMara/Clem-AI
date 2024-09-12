@@ -1,5 +1,5 @@
 # Clem-AI
-Personal at-home serenity companion
+Personal serenity companion monitors real-time speech to determine the negativity level of converstions.  When the conversation becomes too negative, ClemAI outputs an audio notification for the humans to chill out and calm down.
 
 ## Features
 
@@ -9,7 +9,7 @@ Constant audio input is recorded from the mic and converted into text using the 
 
 ### Sentiment Analysis
 
-The sentiment level (positive / negative) of the text is determined using the VADER sentiment analysis tool.
+An estimation of the sentiment level (positive / negative) of text is determined using the VADER sentiment analysis tool.
 
 ### AI Responses
 
@@ -17,7 +17,7 @@ Once the sentiment level is overly "negative", audio cues are provided for the h
 
 ## Installation
 
-Note: On Debian systems, you may need to create and activate a virtual environment via venv.  If this is the case, then you may need to install pyaudio in the vm also.
+Note: On Debian systems, you may need to create and activate a virtual environment via venv to install various packages.
 
 ```bash
 python3 -m venv my_environ_name     # Create the virtual environment
@@ -47,18 +47,26 @@ pip3 install vosk
 
 Install VADER sentiment analysis module
 
-Install Python speech recognition library
 ```bash
 pip install vaderSentiment
+```
+
+### Speech Output
+
+Install audio player library
+
+```bash
+pip pip install simpleaudio
 ```
 
 ## Usage
 
 ## Project Structure
-- `clemai.py`: The main handler script responsible for calling the AI system and handling speech input / output.
-- `audio_input.py`: Handles audio capture from the microphone and processes the data for analysis.
-- `audio_output.py`: Responsible for playing back audio responses.
-- `analyze_voice.py`: Contains the logic for analysing audio input, extracting features, and performing sentiment analysis.
+- `clemai.py`: The main handler script responsible for calling AI systems and determining the overall negativity level.
+- `mic_input.py`: Handles raw audio capture from the microphone.
+- `speech_to_text.py`: Processes audio data converting sentences into text.
+- `sentiment_analysis.py`: Passes text into the VADER model to perform sentiment analysis.
+
 
 ## Contributing
 1. Fork the repository.

@@ -1,5 +1,5 @@
 '''
-Create stream of audio data captured from mic
+Create stream of audio data captured from mic.
 '''
 
 from globals import mic_data_queue
@@ -17,9 +17,10 @@ def get_mic_input(thread_stop):
 
   print("Listening... Ctrl+C to stop.")
 
-  while not thread_stop.is_set():
-    data = stream.read(4000, exception_on_overflow = False)
-    mic_data_queue.put(data)
+  while True:
+    if not thread_stop.is_set():
+        data = stream.read(4000, exception_on_overflow = False)
+        mic_data_queue.put(data)
 
 
 def close_mic():
