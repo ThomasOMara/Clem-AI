@@ -6,17 +6,33 @@ Please be calm, human
 from threading import Thread, Event
 from mic_input import get_mic_input, close_mic
 from speech_to_text import speech_to_text
+from sentiment_analysis import get_sentiment_data
+
+from globals import sentiment_queue
+import time
 
 def main():
 
    thread_stop = Event()
 
    try:
+      sentiment_thread = Thread(target = get_sentiment_data)
       mic_thread =  Thread(target = get_mic_input, args = (thread_stop,))
-      text_thread = Thread(target = speech_to_text, args = (thread_stop,))
+      text_thread = Thread(target = speech_to_text)
 
+
+      sentiment_thread.start()
       mic_thread.start()
       text_thread.start()
+
+      sentiment_level = 0
+
+      while True:
+         if not sentiment_queue.empty():
+            sentiment_data = sentiment_queue.get()
+            sentiment_neg = sentiment_data['neg']
+            sentiment_compound = sentiment_data['compound']
+            print("Sentiment: ", sentiment_compound)
 
    except KeyboardInterrupt:
       print("\nProgram exiting...")
