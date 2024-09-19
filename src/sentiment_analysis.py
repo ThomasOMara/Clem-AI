@@ -20,8 +20,7 @@ sentences as either positive, neutral, or negative. Typical threshold values ...
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-from globals import text_queue
-from globals import sentiment_queue
+from globals import text_queue, sentiment_queue
 
 def get_sentiment_data():
 

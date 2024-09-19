@@ -19,7 +19,7 @@ def get_mic_input(thread_stop):
 
   while True:
     if not thread_stop.is_set():
-        data = stream.read(4000, exception_on_overflow = False)
+        data = stream.read(8000, exception_on_overflow = False)
         mic_data_queue.put(data)
 
 

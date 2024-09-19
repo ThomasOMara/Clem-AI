@@ -2,8 +2,7 @@
 Convert mic data into text.
 '''
 
-from globals import mic_data_queue
-from globals import text_queue
+from globals import mic_data_queue, text_queue
 
 import os
 import json
@@ -19,10 +18,13 @@ def speech_to_text():
     model = Model(vosk_model_path)
     recogniser = KaldiRecognizer(model, 16000)
 
+    print("Starting speech-to-text thread")
+
     while True:
 
         if not mic_data_queue.empty():
             data = mic_data_queue.get()
+            print("Mic data queue size: ", mic_data_queue.qsize())
 
             if recogniser.AcceptWaveform(data):
                 sentence_dict = json.loads(recogniser.Result())

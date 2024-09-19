@@ -11,9 +11,7 @@ from mic_input import get_mic_input, close_mic
 from speech_to_text import speech_to_text
 from sentiment_analysis import get_sentiment_data
 
-from globals import mic_data_queue
-from globals import text_queue
-from globals import sentiment_queue
+from globals import mic_data_queue, text_queue, sentiment_queue
 
 NEGATIVITY_THRESHOLD = 100    # Threshold for triggering audio warning that you're negative
 CONVERSION_FACTOR = 100       # Convert decimal sentiment (eg 0.64 -> 64)
@@ -101,6 +99,7 @@ TO DO NEXT
 
 x. Test everything is working ok
 x. Look over the files for formatting, comments, etc
+x. Fix the proper thread shutdowns on ctrl+c
 x. Put onto a Lego board for testing in kitchen
 x. Make sure ReadMe is in a really good state
 x. How to deploy properly as an application?
