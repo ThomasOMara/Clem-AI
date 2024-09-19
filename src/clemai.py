@@ -97,10 +97,15 @@ if __name__ == '__main__':
 TO DO NEXT
 ------------------------------------------------------------------------------------------------
 
-x. Test everything is working ok
+x. Chime when about 100
+x. Text to speech when above 120/150/200 (?) with a joke
+   - Reset queue when over 120
+   - Keep queue size under 60 (drop back to 20/40)
+
+x. Is there a way to optimise data processing?
+
 x. Look over the files for formatting, comments, etc
 x. Fix the proper thread shutdowns on ctrl+c
-x. Put onto a Lego board for testing in kitchen
 x. Make sure ReadMe is in a really good state
 x. How to deploy properly as an application?
 
